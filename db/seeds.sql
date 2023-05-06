@@ -1,15 +1,18 @@
 INSERT INTO department (department_name)
 VALUES ("Finance"),
        ("Information Technology"),
-       ("Workplace")
+       ("Workplace");
 
-INSERT INTO role (role_id, job_title, salary)
-VALUES ("7000", "Finance Manager", "120000"),
-       ("3000", "Scrum Master", "110000"),
-       ("5000", "Head of Workplace", "380000")
+INSERT INTO role (job_title, salary, department_id)
+VALUES ("Finance Manager", "120000", 1),
+       ("Scrum Master", "110000", 2),
+       ("Head of Workplace", "380000", 3);
 
 
-INSERT INTO employee (employee_id, first_name, last_name)
-VALUES ("1", "Bob", "Smith"),
-       ("2", "Jane", "Maples"),
-       ("3", "Martin", "Box")
+INSERT INTO employee (first_name, last_name)
+VALUES ("Bob", "Smith"),
+       ("Jane", "Maples"),
+       ("Martin", "Box");
+
+
+       INSERT INTO department (department_name) VALUES ("Housekeeping");
