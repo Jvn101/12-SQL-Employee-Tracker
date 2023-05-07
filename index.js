@@ -4,6 +4,9 @@ const inquirer = require("inquirer");
 // Import the connection object
 const db = require("./config/connection");
 
+//TO DO: turn db.query into promises to use async and await
+
+
 // what is this
 db.connect((err) => {
   if (err) throw err;
@@ -30,7 +33,7 @@ function viewRoles() {
 }
 
 function viewEmployees() {
-    let query = "SELECT * FROM employee";
+    let query = "SELECT * FROM employee JOIN manager_id ON employee.id = employee.manager_id";
     db.query(query, function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -45,11 +48,9 @@ function addDepartment() {
       message: "input new department",
       name: "department",
     })
-    .then((answers) => {
-      let query =
-        ("INSERT INTO department (department_name) VALUES (?)",
-        [answers.department]);
-      db.query(query, function (err, res) {
+    .then(function(answers) {
+        //console.log(answers)  
+        db.query("INSERT INTO department (department_name) VALUES (?)", [answers.department], function (err, res) {
         if (err) throw err;
         console.table(res);
         runTracker();
