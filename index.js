@@ -33,11 +33,18 @@ function viewRoles() {
 }
 
 function viewEmployees() {
-    let query = "SELECT * FROM employee JOIN manager_id ON employee.id = employee.manager_id";
+    let query = "SELECT emp.first_name, emp.last_name, rol.job_title, rol.salary, dept.department_name AS department, CONCAT(manager.first_name, ' ', manager.last_name) AS manager \
+    FROM employee emp \
+    LEFT JOIN role rol \
+      ON emp.role_id = rol.id \
+    LEFT JOIN department dept \
+      ON rol.department_id = dept.id \
+    LEFT JOIN employee manager \
+      ON manager.id = emp.manager_id"
     db.query(query, function (err, res) {
       if (err) throw err;
       console.table(res);
-      runTracker();
+      runTracker();8569
     });
 }
 
@@ -61,7 +68,7 @@ function addDepartment() {
 // think how can I get the department id and names to appear for the third prompt question
 function addRole() {
     inquirer
-      .prompt({
+      .prompt([{
         type: "input",
         message: "input new role",
         name: "role",
@@ -75,12 +82,10 @@ function addRole() {
         type: "input",
         message: "input the department id for this role",
         name: "department_id",
-      })
-      .then((answers) => {
-        let query =
-          ("INSERT INTO role (job_title, salary, department_id) VALUES (?, ?, ?)",
-          [answers.role, answers.salary, answers.department_id]);
-        db.query(query, function (err, res) {
+      }])
+      .then(function(answers) {
+        db.query("INSERT INTO role (job_title, salary, department_id) VALUES (?, ?, ?)",
+        [answers.role, answers.salary, answers.department_id], function (err, res) {
           if (err) throw err;
           console.table(res);
           runTracker();
@@ -91,7 +96,7 @@ function addRole() {
   //how will user know what to input for valid employee id and manager id. Error handling function needed and way to view id options?
   function addEmployee() {
     inquirer
-      .prompt({
+      .prompt([{
         type: "input",
         message: "input the new employees first name",
         name: "firstname",
@@ -110,12 +115,34 @@ function addRole() {
         type: "input",
         message: "input the managers id for the new employee ",
         name: "managerid",
-      })
-      .then((answers) => {
-        let query =
-          ("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
-          [answers.firstname, answers.lastname, answers.roleid, answers.managerid]);
-        db.query(query, function (err, res) {
+      }])
+      .then(function(answers) {
+        db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
+        [answers.firstname, answers.lastname, answers.roleid, answers.managerid], function (err, res) {
+          if (err) throw err;
+          console.table(res);
+          runTracker();
+        });
+      });
+  }
+
+// I am prompted to select an employee to update and their new role and this information is updated in the database 
+function updateEmployeeRole() {
+    inquirer
+      .prompt([{
+        type: "list",
+        message: "Select the employee's role you would you like to update",
+        name: "employeelist",
+        choices: () => {"SELECT * from employee"}
+      },
+      {
+        type: "input",
+        message: "enter the new role name ",
+        name: "newrole",
+      }])
+      .then(function(answers) {
+        db.query("UPDATE employee SET role_id=? WHERE first_name =?",
+        [answers.employeelist, answers.newrole], function (err, res) {
           if (err) throw err;
           console.table(res);
           runTracker();
@@ -134,6 +161,7 @@ function runTracker() {
         "Add department",
         "Add role",
         "Add employee",
+        "Update an employee role",
         "exit",
       ],
       message: "Please select one of the following options",
@@ -149,10 +177,13 @@ function runTracker() {
         viewEmployees();
       } else if (answers.option === "Add department") {
         addDepartment();
-      } else if (answer.option === "Add role") {
+      } else if (answers.option === "Add role") {
         addRole();
-      } else if (answers.option === "Add employee") {
+      } else if (answers.option === "Add employee")
+     {
         addEmployee();
+      } else if (answers.option === "Update an employee role"){
+        updateEmployeeRole();
       } else if (answers.option === "exit") {
         process.exit();
       } else {
