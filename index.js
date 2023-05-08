@@ -43,8 +43,10 @@ function viewEmployees() {
       ON manager.id = emp.manager_id"
     db.query(query, function (err, res) {
       if (err) throw err;
+      const allEmployees = res.map(({ id, first_name, last_name }) => ({
+        value: id, name: `${first_name} ${last_name}`}))
       console.table(res);
-      runTracker();8569
+      runTracker();
     });
 }
 
@@ -126,14 +128,16 @@ function addRole() {
       });
   }
 
+
+
 // I am prompted to select an employee to update and their new role and this information is updated in the database 
-function updateEmployeeRole() {
+function updateEmployeeRole(allEmployees) {
     inquirer
       .prompt([{
         type: "list",
         message: "Select the employee's role you would you like to update",
         name: "employeelist",
-        choices: () => {"SELECT * from employee"}
+        choices: allEmployees
       },
       {
         type: "input",
@@ -143,6 +147,35 @@ function updateEmployeeRole() {
       .then(function(answers) {
         db.query("UPDATE employee SET role_id=? WHERE first_name =?",
         [answers.employeelist, answers.newrole], function (err, res) {
+          if (err) throw err;
+          console.table(res);
+          runTracker();
+        });
+      });
+  }
+
+  function viewEmployeebyDepartment() {
+    inquirer
+      .prompt([{
+        type: "list",
+        message: "Select which departments employees you wish to view",
+        name: "dep.employeelist",
+        choices: departmentchoices
+      },
+      {
+        type: "input",
+        message: "enter the new role name ",
+        name: "newrole",
+      }])
+      .then(function(answers) {
+        let query = `SELECT dept.id, dept.name, rol.salary AS budget
+        FROM employee emp
+        LEFT JOIN role rol
+          ON emp.role_id = rol.id
+        LEFT JOIN department dept
+        ON dept.id = rol.department_id
+        GROUP BY dept.id, dept.name`
+        db.query(query, function (err, res) {
           if (err) throw err;
           console.table(res);
           runTracker();
@@ -162,6 +195,7 @@ function runTracker() {
         "Add role",
         "Add employee",
         "Update an employee role",
+        "View employee by department",
         "exit",
       ],
       message: "Please select one of the following options",
@@ -184,6 +218,8 @@ function runTracker() {
         addEmployee();
       } else if (answers.option === "Update an employee role"){
         updateEmployeeRole();
+      } else if (answers.option === "View employee by department") {
+        viewEmployeebyDepartment();
       } else if (answers.option === "exit") {
         process.exit();
       } else {
