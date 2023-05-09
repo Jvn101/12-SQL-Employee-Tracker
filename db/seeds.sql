@@ -11,10 +11,10 @@ VALUES ("Finance Manager", "120000", 1),
 
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Bob", "Smith", 1, NULL),
+VALUES ("Bob A", "Smith", 1, NULL),
        ("Jane", "Maples", 2, NULL),
        ("Martin", "Box", 3, NULL),
-       ("Sally", "Hare", 4, 3);
+       ("Sally L", "Hare", 4, 3);
 
 
 
