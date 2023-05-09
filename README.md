@@ -16,7 +16,7 @@ Install npm i to install project dependencies inquirer and MySQL
 
 ## Video walkthrough
 
-For this project we have created a video walkthrough demonstrating how this project can be used. Click [here](https://drive.google.com/file/d/1R26Ej9N-vCbZr8AmvlMAGCv0b3pLB8f_/view)) to view.
+For this project we have created a video walkthrough demonstrating how this project can be used. Click [here](https://drive.google.com/file/d/1R26Ej9N-vCbZr8AmvlMAGCv0b3pLB8f_/view) to view.
 
 ***
 ### Contact us
