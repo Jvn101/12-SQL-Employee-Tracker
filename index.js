@@ -143,36 +143,58 @@ function addRole() {
 //}
 
 function updateEmployeeRole() {
-    let query = "SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) AS employee FROM employee"
-    db.query(query, function (err, employeeres) {
+    const query = "SELECT employee.id, employee.first_name AS employee FROM employee"
+    //let employeeNames;
+    db.query(query, function (err, res) {
         if (err) throw err;
         // const allEmployees = res.map(({ id, first_name, last_name}) => ({value: id, name: `${first_name} ${last_name}`}))
-        console.table(employeeres)
-        inquirerUpdateEmployeeRole(employeeres)
+
+        const employeeNames = res.map(
+          (employeeData) => {
+            return (employeeData.employee)
+          })
+
+        console.table(employeeNames)
+        console.log(employeeNames)
+        roleId(employeeNames)
+        //inquirerUpdateEmployeeRole(employeeres)
 })
 }
 
-function roleId() {
-  let query = "SELECT role.id, role.job_title AS role FROM role"
-  db.query(query, function (err, roleres) {
+function roleId(employeeNames) {
+  const query = "SELECT role.id, role.job_title FROM role"
+  
+
+  db.query(query, function (err, res) {
     if (err) throw err;
-    console.table(roleres)
-    inquirerUpdateEmployeeRole(roleres)
+    console.table(res)
+    console.log(res)
+
+    const newrole = res.map(
+      (roledata) => {
+        return (roledata.id)
+      
+      }
+    )
+    console.log("role id" + newrole)
+    //console.log("ROLEID" + roledata.id)
+
+    inquirerUpdateEmployeeRole(employeeNames, newrole)
 })
 }
 
 // I am prompted to select an employee to update and their new role and this information is updated in the database 
-function inquirerUpdateEmployeeRole(employeeres, roleres) {
-  const employeeNames = employeeres.map(
-      (employeeData) => {
-        return (employeeData.employee)
+function inquirerUpdateEmployeeRole(employeeNames, newrole) {
+  // const employeeNames = employeeres.map(
+  //     (employeeData) => {
+  //       return ({id:employeeData.id, name: employeeData.employee})
         //return (employeeData.id + ' ' + employeeData.employee)
-})
-  const newrole = roleres.map(
-    (roledata) => {
-      return (roledata.id)
-    }
-  )
+//})
+  // const newrole = roleres.map(
+  //   (roledata) => {
+  //     return (roledata.id)
+  //   }
+  // )
   
   //console.log(allEmployees)
     inquirer
@@ -184,15 +206,16 @@ function inquirerUpdateEmployeeRole(employeeres, roleres) {
       },
       {
         type: "input",
-        message: "enter the new role name", 
+        message: "enter the new role id", 
         name: "updatedrole",
-        choices: newrole,
+        //choices: newrole,
       }])
       .then(function(answers) {
-        db.query("UPDATE employee SET role_id=? WHERE employee.id =?",
-        [answers.updatedrole, answers.employeelist.id], function (err, res) {
+        db.query("UPDATE employee SET role_id=? WHERE first_name =?",
+        [answers.updatedrole, answers.employeelist], function (err, res) {
           if (err) throw err;
-          console.log(answers.newrole)
+          console.log("role id")
+          console.log(answers.updatedrole)
           console.log("employee list")
           console.log(answers.employeelist)
 
