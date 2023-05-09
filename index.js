@@ -128,25 +128,47 @@ function addRole() {
       });
   }
 
+//function updateEmployeeRole() {
+    //let query = "SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS employee FROM employee"
+    //db.query(query, function (err, res) {
+      //if (err) throw err;
+      //const allEmployees = allEmployees[0].map(res)
+      //res.map(({ id, first_name, last_name }) => ({
+        //value: id, name: `${first_name} ${last_name}`}))
+      //console.table(res);
+      //employeeList();
+    //}//);
 
+
+//}
+
+function updateEmployeeRole() {
+    let query = "SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) AS employee FROM employee"
+    db.query(query, function (err, res) {
+        if (err) throw err;
+        const allEmployees = res.map(({ id, first_name, last_name}) => ({value: id, name: `${first_name} ${last_name}`}))
+        console.table(res)
+        inquirerUpdateEmployeeRole(allEmployees)
+})
+}
 
 // I am prompted to select an employee to update and their new role and this information is updated in the database 
-function updateEmployeeRole(allEmployees) {
+function inquirerUpdateEmployeeRole(allEmployees) {
     inquirer
       .prompt([{
         type: "list",
-        message: "Select the employee's role you would you like to update",
+        message: "Select the employee whose role you would you like to update",
         name: "employeelist",
         choices: allEmployees
       },
       {
         type: "input",
-        message: "enter the new role name ",
+        message: "enter the new role name",
         name: "newrole",
       }])
       .then(function(answers) {
         db.query("UPDATE employee SET role_id=? WHERE first_name =?",
-        [answers.employeelist, answers.newrole], function (err, res) {
+        [answers.newrole, answers.employeelist.value], function (err, res) {
           if (err) throw err;
           console.table(res);
           runTracker();
@@ -194,7 +216,7 @@ function runTracker() {
         "Add department",
         "Add role",
         "Add employee",
-        "Update an employee role",
+        "Update an employees role",
         "View employee by department",
         "exit",
       ],
@@ -213,10 +235,9 @@ function runTracker() {
         addDepartment();
       } else if (answers.option === "Add role") {
         addRole();
-      } else if (answers.option === "Add employee")
-     {
+      } else if (answers.option === "Add employee") {
         addEmployee();
-      } else if (answers.option === "Update an employee role"){
+      } else if (answers.option === "Update an employees role"){
         updateEmployeeRole();
       } else if (answers.option === "View employee by department") {
         viewEmployeebyDepartment();
