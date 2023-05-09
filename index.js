@@ -144,66 +144,92 @@ function addRole() {
 
 function updateEmployeeRole() {
     let query = "SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) AS employee FROM employee"
-    db.query(query, function (err, res) {
+    db.query(query, function (err, employeeres) {
         if (err) throw err;
-        const allEmployees = res.map(({ id, first_name, last_name}) => ({value: id, name: `${first_name} ${last_name}`}))
-        console.table(res)
-        inquirerUpdateEmployeeRole(allEmployees)
+        // const allEmployees = res.map(({ id, first_name, last_name}) => ({value: id, name: `${first_name} ${last_name}`}))
+        console.table(employeeres)
+        inquirerUpdateEmployeeRole(employeeres)
+})
+}
+
+function roleId() {
+  let query = "SELECT role.id, role.job_title AS role FROM role"
+  db.query(query, function (err, roleres) {
+    if (err) throw err;
+    console.table(roleres)
+    inquirerUpdateEmployeeRole(roleres)
 })
 }
 
 // I am prompted to select an employee to update and their new role and this information is updated in the database 
-function inquirerUpdateEmployeeRole(allEmployees) {
+function inquirerUpdateEmployeeRole(employeeres, roleres) {
+  const employeeNames = employeeres.map(
+      (employeeData) => {
+        return (employeeData.employee)
+        //return (employeeData.id + ' ' + employeeData.employee)
+})
+  const newrole = roleres.map(
+    (roledata) => {
+      return (roledata.id)
+    }
+  )
+  
+  //console.log(allEmployees)
     inquirer
       .prompt([{
         type: "list",
         message: "Select the employee whose role you would you like to update",
         name: "employeelist",
-        choices: allEmployees
+        choices: employeeNames
       },
       {
         type: "input",
-        message: "enter the new role name",
-        name: "newrole",
+        message: "enter the new role name", 
+        name: "updatedrole",
+        choices: newrole,
       }])
       .then(function(answers) {
-        db.query("UPDATE employee SET role_id=? WHERE first_name =?",
-        [answers.newrole, answers.employeelist.value], function (err, res) {
+        db.query("UPDATE employee SET role_id=? WHERE employee.id =?",
+        [answers.updatedrole, answers.employeelist.id], function (err, res) {
           if (err) throw err;
+          console.log(answers.newrole)
+          console.log("employee list")
+          console.log(answers.employeelist)
+
           console.table(res);
           runTracker();
         });
       });
   }
 
-  function viewEmployeebyDepartment() {
-    inquirer
-      .prompt([{
-        type: "list",
-        message: "Select which departments employees you wish to view",
-        name: "dep.employeelist",
-        choices: departmentchoices
-      },
-      {
-        type: "input",
-        message: "enter the new role name ",
-        name: "newrole",
-      }])
-      .then(function(answers) {
-        let query = `SELECT dept.id, dept.name, rol.salary AS budget
-        FROM employee emp
-        LEFT JOIN role rol
-          ON emp.role_id = rol.id
-        LEFT JOIN department dept
-        ON dept.id = rol.department_id
-        GROUP BY dept.id, dept.name`
-        db.query(query, function (err, res) {
-          if (err) throw err;
-          console.table(res);
-          runTracker();
-        });
-      });
-  }
+  // function viewEmployeebyDepartment() {
+  //   inquirer
+  //     .prompt([{
+  //       type: "list",
+  //       message: "Select which departments employees you wish to view",
+  //       name: "dep.employeelist",
+  //       choices: departmentchoices
+  //     },
+  //     {
+  //       type: "input",
+  //       message: "enter the new role name ",
+  //       name: "newrole",
+  //     }])
+  //     .then(function(answers) {
+  //       let query = `SELECT dept.id, dept.name, rol.salary AS budget
+  //       FROM employee emp
+  //       LEFT JOIN role rol
+  //         ON emp.role_id = rol.id
+  //       LEFT JOIN department dept
+  //       ON dept.id = rol.department_id
+  //       GROUP BY dept.id, dept.name`
+  //       db.query(query, function (err, res) {
+  //         if (err) throw err;
+  //         console.table(res);
+  //         runTracker();
+  //       });
+  //     });
+  // }
 
 function runTracker() {
   inquirer
@@ -217,7 +243,6 @@ function runTracker() {
         "Add role",
         "Add employee",
         "Update an employees role",
-        "View employee by department",
         "exit",
       ],
       message: "Please select one of the following options",

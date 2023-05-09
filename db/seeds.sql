@@ -16,5 +16,5 @@ VALUES ("Bob", "Smith", 1, NULL),
        ("Martin", "Box", 3, NULL),
        ("Sally", "Hare", 4, 3);
 
--- Is manager id role id?--
+
        
